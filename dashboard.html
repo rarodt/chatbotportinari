@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard de Leads | Escola Portinari</title>
+<style>
+:root{
+  --navy:#1a2b63;--red:#e2574c;--yellow:#f4c430;--green:#6fa287;
+  --orange:#f0932b;--ink:#1f2a44;--muted:#6b7589;--line:#e3e0d3;--cream:#f7f3e8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(160deg,#f7f3e8 0%,#eef3e6 55%,#e3efe3 100%);font-family:Arial,Helvetica,sans-serif;color:var(--ink);min-height:100vh}
+
+/* ===== LOGIN ===== */
+#loginScreen{min-height:100vh;display:grid;place-items:center;padding:20px}
+.loginBox{background:#fff;border-radius:22px;box-shadow:0 20px 50px rgba(26,43,99,0.15);padding:36px 30px;width:100%;max-width:380px;text-align:center}
+.loginBox .logo{width:56px;height:56px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-weight:800;margin:0 auto 14px;font-size:18px}
+.loginBox h1{font-size:19px;margin:0 0 4px;color:var(--navy);font-family:Georgia,serif;font-style:italic}
+.loginBox p{font-size:13px;color:var(--muted);margin:0 0 22px}
+.loginBox input{width:100%;padding:13px;border:1.5px solid var(--line);border-radius:12px;font-size:14px;margin-bottom:12px;background:#fbfbf7}
+.loginBox input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 4px rgba(226,87,76,0.12)}
+.loginBox button{width:100%;padding:13px;border:0;border-radius:12px;background:linear-gradient(135deg,var(--red),#c7453b);color:#fff;font-weight:800;font-size:14.5px;cursor:pointer;box-shadow:0 6px 16px rgba(226,87,76,0.3)}
+.loginBox button:disabled{opacity:.6;cursor:not-allowed}
+.loginMsg{font-size:12.5px;margin-top:12px;min-height:16px}
+.loginMsg.error{color:#b3261e;font-weight:700}
+.loginMsg.info{color:var(--green);font-weight:700}
+.firstAccessTag{display:inline-block;background:#fff4d6;color:#8a6d00;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:20px;margin-bottom:16px}
+
+/* ===== DASHBOARD ===== */
+#app{display:none}
+.topbar{background:var(--navy);color:#fff;padding:16px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.topbar .logo{width:40px;height:40px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0}
+.topbar h1{font-size:16.5px;margin:0;font-family:Georgia,serif;font-style:italic}
+.topbar small{opacity:.8;font-size:11.5px;display:block}
+.logoutBtn{margin-left:auto;background:rgba(255,255,255,0.15);border:0;color:#fff;padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer}
+
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.card{background:#fff;border-radius:16px;padding:18px;box-shadow:0 3px 10px rgba(26,43,99,0.06);border-left:5px solid var(--green)}
+.card.novo{border-left-color:var(--red)}
+.card.contato{border-left-color:var(--orange)}
+.card.visita{border-left-color:var(--yellow)}
+.card.matriculado{border-left-color:var(--green)}
+.card span{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.card strong{font-size:28px;color:var(--navy)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.toolbar input, .toolbar select{padding:10px 13px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;background:#fff}
+.toolbar input{flex:1;min-width:180px}
+.refreshBtn{background:#fff;border:1.5px solid var(--line);color:var(--navy);padding:10px 15px;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer}
+
+.tableWrap{background:#fff;border-radius:16px;overflow-x:auto;box-shadow:0 3px 10px rgba(26,43,99,0.06)}
+table{width:100%;border-collapse:collapse;min-width:900px}
+th{text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;padding:14px 12px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:13px 12px;font-size:13.5px;border-bottom:1px solid #f1efe6;vertical-align:top}
+tr:hover td{background:#fafaf6}
+.tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11.5px;font-weight:700}
+.tag.Novo{background:#fdecea;color:#b3261e}
+.tag.Em-contato{background:#fff0dc;color:#8a5700}
+.tag.Visita-agendada{background:#fff8d6;color:#8a6d00}
+.tag.Matriculado{background:#e3f2e9;color:#1f6b45}
+.tag.Nao-tem-interesse{background:#eceef3;color:#505a6e}
+select.statusSelect{padding:7px 9px;border-radius:9px;border:1.5px solid var(--line);font-size:12.5px;background:#fff}
+.wa{color:var(--green);font-weight:700;text-decoration:none}
+.empty{padding:40px;text-align:center;color:var(--muted);font-size:14px}
+.loadingRow{padding:30px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="loginBox">
+    <div class="logo">EP</div>
+    <h1 id="loginTitle">Dashboard de Leads</h1>
+    <p id="loginSubtitle">Escola Portinari - Acesso restrito</p>
+    <div id="firstAccessBadge" class="firstAccessTag hidden" style="display:none">Primeiro acesso: crie sua senha</div>
+    <input type="password" id="passwordInput" placeholder="Digite a senha" autocomplete="current-password">
+    <button id="loginBtn">Entrar</button>
+    <div class="loginMsg" id="loginMsg"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo">EP</div>
+    <div>
+      <h1>Dashboard de Leads</h1>
+      <small>Escola Portinari - Matrículas 2027</small>
+    </div>
+    <button class="logoutBtn" id="logoutBtn">Sair</button>
+  </div>
+
+  <div class="wrap">
+    <div class="cards" id="cards"></div>
+
+    <div class="toolbar">
+      <input type="text" id="searchInput" placeholder="Buscar por nome, WhatsApp ou criança...">
+      <select id="statusFilter">
+        <option value="">Todos os status</option>
+        <option value="Novo">Novo</option>
+        <option value="Em contato">Em contato</option>
+        <option value="Visita agendada">Visita agendada</option>
+        <option value="Matriculado">Matriculado</option>
+        <option value="Não tem interesse">Não tem interesse</option>
+      </select>
+      <button class="refreshBtn" id="refreshBtn">Atualizar</button>
+    </div>
+
+    <div class="tableWrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Responsável</th>
+            <th>WhatsApp</th>
+            <th>Criança</th>
+            <th>Idade</th>
+            <th>Série</th>
+            <th>Período</th>
+            <th>Tipo</th>
+            <th>Observação</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="10" class="loadingRow">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const ENDPOINT = "https://script.google.com/macros/s/AKfycbwUjyobC3WWwgTYuRsjjpjZgjuw661oHMWHmxAC9J52Los9ba3GmQBz-VH3sDZSnIKT/exec";
+
+const STATUS_OPTIONS = ["Novo", "Em contato", "Visita agendada", "Matriculado", "Não tem interesse"];
+
+let currentPassword = sessionStorage.getItem("dash_pwd") || "";
+let allLeads = [];
+
+const loginScreen = document.getElementById("loginScreen");
+const app = document.getElementById("app");
+const passwordInput = document.getElementById("passwordInput");
+const loginBtn = document.getElementById("loginBtn");
+const loginMsg = document.getElementById("loginMsg");
+const firstAccessBadge = document.getElementById("firstAccessBadge");
+
+function setLoginMsg(text, type) {
+  loginMsg.textContent = text;
+  loginMsg.className = "loginMsg " + (type || "");
+}
+
+async function tryLogin(password) {
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Entrando...";
+  setLoginMsg("", "");
+  try {
+    const url = ENDPOINT + "?action=login&password=" + encodeURIComponent(password);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.ok) {
+      currentPassword = password;
+      sessionStorage.setItem("dash_pwd", password);
+      loginScreen.style.display = "none";
+      app.style.display = "block";
+      loadLeads();
+    } else {
+      setLoginMsg(data.error || "Senha incorreta.", "error");
+    }
+  } catch (err) {
+    setLoginMsg("Erro de conexão. Tente novamente.", "error");
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Entrar";
+  }
+}
+
+loginBtn.addEventListener("click", function () {
+  const pwd = passwordInput.value.trim();
+  if (!pwd) { setLoginMsg("Digite uma senha.", "error"); return; }
+  tryLogin(pwd);
+});
+passwordInput.addEventListener("keydown", function (e) {
+  if (e.key === "Enter") loginBtn.click();
+});
+
+document.getElementById("logoutBtn").addEventListener("click", function () {
+  sessionStorage.removeItem("dash_pwd");
+  location.reload();
+});
+
+function slug(status) {
+  return status.replace(/\s+/g, "-").replace(/[^\w-]/g, "");
+}
+
+function renderCards(leads) {
+  const counts = { Total: leads.length, "Novo": 0, "Em contato": 0, "Visita agendada": 0, "Matriculado": 0 };
+  leads.forEach(l => { if (counts[l.status] !== undefined) counts[l.status]++; });
+
+  const cardsEl = document.getElementById("cards");
+  cardsEl.innerHTML =
+    '<div class="card"><span>Total de leads</span><strong>' + counts.Total + '</strong></div>' +
+    '<div class="card novo"><span>Novos</span><strong>' + counts["Novo"] + '</strong></div>' +
+    '<div class="card contato"><span>Em contato</span><strong>' + counts["Em contato"] + '</strong></div>' +
+    '<div class="card visita"><span>Visita agendada</span><strong>' + counts["Visita agendada"] + '</strong></div>' +
+    '<div class="card matriculado"><span>Matriculados</span><strong>' + counts["Matriculado"] + '</strong></div>';
+}
+
+function renderTable(leads) {
+  const body = document.getElementById("tableBody");
+  if (leads.length === 0) {
+    body.innerHTML = '<tr><td colspan="10" class="empty">Nenhum lead encontrado.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = leads.map(l => {
+    const whatsapp = l.whatsapp || "";
+    const waDigits = whatsapp.replace(/\D/g, "");
+    const waLink = waDigits ? "https://wa.me/55" + waDigits : "#";
+
+    const options = STATUS_OPTIONS.map(s =>
+      "<option value='" + s + "'" + (s === l.status ? " selected" : "") + ">" + s + "</option>"
+    ).join("");
+
+    return "<tr>" +
+      "<td>" + (l.dataHora || "-") + "</td>" +
+      "<td>" + (l.responsavel || "-") + "</td>" +
+      "<td>" + (waDigits ? "<a class='wa' href='" + waLink + "' target='_blank'>" + whatsapp + "</a>" : (whatsapp || "-")) + "</td>" +
+      "<td>" + (l.crianca || "-") + "</td>" +
+      "<td>" + (l.idade || "-") + "</td>" +
+      "<td>" + (l.serie || "-") + "</td>" +
+      "<td>" + (l.periodo || "-") + "</td>" +
+      "<td>" + (l.tipoSolicitacao || "-") + "</td>" +
+      "<td style='max-width:200px'>" + (l.observacao || "-") + "</td>" +
+      "<td><select class='statusSelect' data-row='" + l.rowIndex + "'>" + options + "</select></td>" +
+      "</tr>";
+  }).join("");
+
+  document.querySelectorAll(".statusSelect").forEach(sel => {
+    sel.addEventListener("change", function () {
+      updateStatus(this.dataset.row, this.value, this);
+    });
+  });
+}
+
+function applyFilters() {
+  const term = document.getElementById("searchInput").value.toLowerCase().trim();
+  const statusFilter = document.getElementById("statusFilter").value;
+
+  let filtered = allLeads.filter(l => {
+    const matchesTerm = !term ||
+      (l.responsavel || "").toLowerCase().includes(term) ||
+      (l.whatsapp || "").toLowerCase().includes(term) ||
+      (l.crianca || "").toLowerCase().includes(term);
+    const matchesStatus = !statusFilter || l.status === statusFilter;
+    return matchesTerm && matchesStatus;
+  });
+
+  renderTable(filtered);
+}
+
+async function loadLeads() {
+  document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="loadingRow">Carregando...</td></tr>';
+  try {
+    const url = ENDPOINT + "?action=list&password=" + encodeURIComponent(currentPassword);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) {
+      if (data.error === "Não autorizado.") {
+        sessionStorage.removeItem("dash_pwd");
+        location.reload();
+        return;
+      }
+      alert("Erro ao carregar leads: " + data.error);
+      return;
+    }
+    allLeads = data.leads;
+    renderCards(allLeads);
+    applyFilters();
+  } catch (err) {
+    document.getElementById("tableBody").innerHTML = '<tr><td colspan="10" class="empty">Erro ao carregar dados. Verifique sua conexão.</td></tr>';
+  }
+}
+
+async function updateStatus(rowIndex, status, selectEl) {
+  selectEl.disabled = true;
+  try {
+    const url = ENDPOINT + "?action=updateStatus&password=" + encodeURIComponent(currentPassword) +
+      "&row=" + rowIndex + "&status=" + encodeURIComponent(status);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) {
+      alert("Erro ao atualizar status: " + data.error);
+    } else {
+      const lead = allLeads.find(l => l.rowIndex == rowIndex);
+      if (lead) lead.status = status;
+      renderCards(allLeads);
+    }
+  } catch (err) {
+    alert("Erro de conexão ao atualizar status.");
+  } finally {
+    selectEl.disabled = false;
+  }
+}
+
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("statusFilter").addEventListener("change", applyFilters);
+document.getElementById("refreshBtn").addEventListener("click", loadLeads);
+
+// Checa se já tem sessão ativa
+if (currentPassword) {
+  loginScreen.style.display = "none";
+  app.style.display = "block";
+  loadLeads();
+}
+</script>
+</body>
+</html>
