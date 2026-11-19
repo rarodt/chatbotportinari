@@ -7,6 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '28894740433558239');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=28894740433558239&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 <style>
 :root{
   --navy:#16325c; --navy2:#2b5aa6; --gold:#ffc233; --coral:#ff7a59; --coral2:#ff9a4d;
@@ -27,7 +44,6 @@ body{
     linear-gradient(160deg,#fdf8f0,#f3ecff);
   overflow-x:hidden;
 }
-/* floating playful shapes on desktop background */
 .deco{position:fixed;border-radius:50%;filter:blur(2px);opacity:.55;pointer-events:none;z-index:0}
 .deco.d1{width:90px;height:90px;top:8%;left:6%;background:var(--gold);animation:float 7s ease-in-out infinite}
 .deco.d2{width:60px;height:60px;top:70%;left:10%;background:var(--coral);animation:float 9s ease-in-out infinite reverse}
@@ -48,7 +64,6 @@ body{
   .deco{display:none}
 }
 
-/* ===== Header (WhatsApp-like, school-branded) ===== */
 header{
   position:relative; flex:0 0 auto;
   background:linear-gradient(120deg,var(--navy),var(--navy2));
@@ -85,7 +100,6 @@ header > img{width:48px;height:48px;border-radius:50%;object-fit:contain;flex:0 
 }
 .icon-btn:hover{background:#ffffff22}
 
-/* ===== Chat area ===== */
 main{
   flex:1; overflow-y:auto; padding:16px 12px 10px; position:relative;
   background-image:radial-gradient(#e2d8c4 1.2px, transparent 1.2px), radial-gradient(#e2d8c4 1px, transparent 1px);
@@ -107,7 +121,6 @@ main{
 }
 .row.bot .bubble{background:var(--white);border-bottom-left-radius:5px;color:var(--ink)}
 .row.user .bubble{background:var(--user-bubble);border-bottom-right-radius:5px;color:#1f2c1a}
-/* tails */
 .row.bot .bubble::before{
   content:"";position:absolute;left:-7px;bottom:0;width:14px;height:14px;
   background:var(--white);clip-path:polygon(100% 0,100% 100%,0 100%);
@@ -123,7 +136,6 @@ main{
 }
 .row.user .time{color:#6f8a5f}
 
-/* typing indicator */
 .typing .bubble{padding:12px 16px 10px}
 .tdots{display:inline-flex;gap:4px;align-items:center;height:16px}
 .tdots span{width:7px;height:7px;border-radius:50%;background:#b6c0cc;animation:bounce 1.2s infinite}
@@ -131,7 +143,6 @@ main{
 .tdots span:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
 
-/* quick reply chips (WhatsApp style) */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 2px 16px;animation:pop .28s ease-out}
 .chip{
   border:1.5px solid #e2d8c6; background:#fffdf8; color:var(--navy);
@@ -142,7 +153,6 @@ main{
 .chip:hover{border-color:var(--coral);color:var(--coral);transform:translateY(-1px);box-shadow:0 4px 10px #ff7a5922}
 .chip:active{transform:scale(.97)}
 
-/* action buttons */
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin:4px 2px 16px;animation:pop .28s ease-out}
 .btn{
   border:0; border-radius:999px; padding:11px 18px; font-family:'Nunito',sans-serif;
@@ -157,7 +167,6 @@ main{
 .btn.secondary:hover{border-color:var(--navy2)}
 .btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
 
-/* form card */
 form.card{
   background:#fffdf8; border-radius:20px; padding:18px 16px 14px; margin:2px 2px 16px;
   box-shadow:0 6px 20px #16325c18; display:grid; gap:12px; animation:pop .28s ease-out;
@@ -187,7 +196,6 @@ form.card textarea{resize:vertical}
 .error{font-size:12.5px;color:#c62828;font-weight:800;text-align:center}
 .hidden{display:none!important}
 
-/* ===== Bottom input bar (WhatsApp-like) ===== */
 .composer{
   flex:0 0 auto; display:flex; align-items:flex-end; gap:8px;
   padding:10px 10px calc(10px + env(safe-area-inset-bottom)); background:transparent;
@@ -386,7 +394,10 @@ async function prices(){
 async function human(){
   await say("Você pode continuar o atendimento diretamente com nossa equipe pelo WhatsApp. 💬");
   addActions([
-    {label:"Abrir WhatsApp", primary:true, action:()=>window.open(WA_LINK(),"_blank")},
+    {label:"Abrir WhatsApp", primary:true, action:()=>{
+      if (typeof fbq === "function") fbq('track', 'Lead', { content_name: 'falar_com_escola' });
+      window.open(WA_LINK(),"_blank");
+    }},
     {label:"Voltar ao menu", action:home}
   ]);
 }
@@ -435,12 +446,18 @@ function showForm(isVisit){
     if (CONFIG.SHEETS_ENDPOINT.includes("COLE_AQUI")) {
       form.remove();
       await say("O formulário está pronto, mas ainda precisamos conectar a planilha Google antes de receber solicitações. Por enquanto, fale com nossa equipe pelo WhatsApp.");
-      addActions([{label:"Abrir WhatsApp", primary:true, action:()=>window.open(WA_LINK(),"_blank")}]);
+      addActions([{label:"Abrir WhatsApp", primary:true, action:()=>{
+        if (typeof fbq === "function") fbq('track', 'Lead', { content_name: 'falar_com_escola' });
+        window.open(WA_LINK(),"_blank");
+      }}]);
       return;
     }
 
     try {
       await fetch(CONFIG.SHEETS_ENDPOINT, { method:"POST", body:data, mode:"no-cors" });
+      if (typeof fbq === "function") {
+        fbq('track', 'Lead', { content_name: isVisit ? 'agendamento_visita' : 'interesse_matricula' });
+      }
       form.remove();
       await say("Recebemos sua solicitação! 🎉 Nossa equipe entrará em contato pelo WhatsApp para dar continuidade ao atendimento e, se for o caso, confirmar a visita.");
       addActions([{label:"Voltar ao menu inicial", primary:true, action:home},{label:"Falar com a equipe", action:human}]);
@@ -453,7 +470,6 @@ function showForm(isVisit){
   chat.appendChild(form); scrollDown();
 }
 
-/* free-text input (WhatsApp feel) */
 document.getElementById("composer").addEventListener("submit", async (e)=>{
   e.preventDefault();
   const input = document.getElementById("msgInput");
@@ -466,7 +482,10 @@ document.getElementById("composer").addEventListener("submit", async (e)=>{
 });
 
 document.getElementById("backBtn").addEventListener("click", ()=>{ addBubble("Voltar ao início","user"); home(); });
-document.getElementById("callBtn").addEventListener("click", ()=>window.open(WA_LINK(),"_blank"));
+document.getElementById("callBtn").addEventListener("click", ()=>{
+  if (typeof fbq === "function") fbq('track', 'Lead', { content_name: 'falar_com_escola' });
+  window.open(WA_LINK(),"_blank");
+});
 
 home();
 </script>
